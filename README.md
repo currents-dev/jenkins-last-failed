@@ -8,3 +8,11 @@ This is an example repository that showcases using [Currents.dev](https://curren
 - Note: set the `CURRENTS_PROJECT_ID` [Jenkins credential](https://www.jenkins.io/doc/book/security/credentials/) variable - obtain the project id from [Currents.dev](https://app.currents.dev)
 
 - Note: set the `CURRENTS_API_KEY` [Jenkins credential](https://www.jenkins.io/doc/book/security/credentials/) variable - obtain the API Key from [Currents.dev](https://app.currents.dev)
+
+
+# Jenkins Setup
+
+The following plugins are needed (You can find it with the same names):
+- Github Plugin
+- Pipeline Plugin
+- SCM Api Plugin
