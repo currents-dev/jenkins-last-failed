@@ -27,7 +27,7 @@ pipeline {
                 sh 'npm ci'
                 sh 'npx playwright install'
                 sh 'rm -rf test-results'
-                sh 'rm -rf scripts/.last-run.json'
+                sh 'rm -rf .last-run.json'
             }
         }
 
@@ -55,8 +55,8 @@ def runTestsDecision(ciBuildId, isOrchestration) {
             script {
                 echo "Running tests with last failed: ${ciBuildId} ${env.TOTAL_SHARDS}"
                 script {
-                    sh 'node scripts/apiRequest.js'
-                    sh 'cat scripts/.last-run.json'
+                    sh "npx currents api get-run --api-key ${env.CURRENTS_API_KEY} --project-id ${env.CURRENTS_PROJECT_ID} --ci-build-id ${env.CI_BUILD_ID} --pw-last-run --output .last-run.json"
+                    sh 'cat .last-run.json'
                 }
                 if (isOrchestration && isOrchestration == true) {
                     runPlaywrightOrchestration(env.PARALLEL_JOBS.toInteger(), true)
@@ -86,7 +86,7 @@ def runPlaywrightSharded(shardTotal, lastFailed) {
         parallelStages["shard${shardIndex}"] = {
             if (lastFailed) {
                 sh "mkdir -p test-results/shard-${shardIndex}"
-                sh "cp scripts/.last-run.json test-results/shard-${shardIndex}/.last-run.json"
+                sh "cp .last-run.json test-results/shard-${shardIndex}/.last-run.json"
                 runPlaywrightTestsLastFailed(shardIndex, shardTotal)
             } else {
                 runPlaywrightTests(shardIndex, shardTotal)
@@ -123,7 +123,7 @@ def runPlaywrightOrchestration(parallelTotal, lastFailed) {
         parallelStages["parallel${parallelIndex}"] = {
             if (lastFailed) {
                 sh "mkdir -p test-results/parallel-${parallelIndex}"
-                sh "cp scripts/.last-run.json test-results/parallel-${parallelIndex}/.last-run.json"
+                sh "cp .last-run.json test-results/parallel-${parallelIndex}/.last-run.json"
                 runPlaywrightTestsLastFailedOrchestration(parallelIndex)
             } else {
                 runPlaywrightTestsOrchestration(parallelIndex)
@@ -136,7 +136,7 @@ def runPlaywrightOrchestration(parallelTotal, lastFailed) {
 def runPlaywrightTestsOrchestration(parallelIndex) {
     stage("Run Playwright Tests - Orchestration ${parallelIndex}") {
         script {
-            def command = "npx pwc-p"
+            def command = 'npx pwc-p'
             echo "Running command: ${command}"
             sh "${command}"
         }
